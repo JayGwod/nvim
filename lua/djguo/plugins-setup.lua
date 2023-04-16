@@ -1,3 +1,4 @@
+-- auto install packer if not installed
 local ensure_packer = function()
 	local fn = vim.fn
 	local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
@@ -10,7 +11,8 @@ local ensure_packer = function()
 end
 local packer_bootstrap = ensure_packer() -- true if packer was just installed
 
--- Autocommand that reloads neovim whenever you save this file
+-- autocommand that reloads neovim and installs/updates/removes plugins
+-- when file is saved
 vim.cmd([[
   augroup packer_user_config
     autocmd!
@@ -18,12 +20,15 @@ vim.cmd([[
   augroup end
 ]])
 
+-- import packer safely
 local status, packer = pcall(require, "packer")
 if not status then
 	return
 end
 
+-- add list of plugins to install
 return packer.startup(function(use)
+	-- packer can manage itself
 	use("wbthomason/packer.nvim")
 
 	-- lua functions that many plugins use
@@ -33,6 +38,9 @@ return packer.startup(function(use)
 	use("Tsuzat/NeoSolarized.nvim") -- preferred colorscheme
 	use("bluz71/vim-nightfly-guicolors")
 
+	-- A Lua rewrite of vim-lastplace
+	use("ethanholz/nvim-lastplace")
+
 	-- tmux & split window navigation
 	use("christoomey/vim-tmux-navigator")
 
@@ -40,8 +48,8 @@ return packer.startup(function(use)
 	use("szw/vim-maximizer")
 
 	-- essential plugins
-	use("tpope/vim-surround")
-	use("vim-scripts/ReplaceWithRegister")
+	use("tpope/vim-surround") -- add, delete, change surroundings (it's awesome)
+	use("inkarkat/vim-ReplaceWithRegister") -- replace with register contents using motion (gr + motion)
 
 	-- commenting with gc
 	use("numToStr/Comment.nvim")
@@ -49,15 +57,33 @@ return packer.startup(function(use)
 	-- file explorer
 	use("nvim-tree/nvim-tree.lua")
 
-	-- icons
-	use("kyazdani42/nvim-web-devicons")
+	-- vs-code like icons
+	use("nvim-tree/nvim-web-devicons")
+
+	-- vim dashboard
+	-- you cannot remove the config item during installation,
+	-- otherwise it will make subsequent configuration updates impossible.
+	-- https://github.com/nvimdev/dashboard-nvim/issues/263#issue-1560763418
+	use({
+		"glepnir/dashboard-nvim",
+		-- event = 'VimEnter',
+		-- config = function()
+		-- require('dashboard').setup {
+		-- config
+		-- }
+		-- end,
+		-- requires = { "nvim-tree/nvim-web-devicons" },
+	})
 
 	-- statusline
 	use("nvim-lualine/lualine.nvim")
 
-	-- fuzzy finding
+	-- fuzzy finding w/ telescope
 	use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" }) -- dependency for better sorting performance
 	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" }) -- fuzzy finder
+
+	-- create Telescope pickers from arbitrary console commands
+	use({ "axkirillov/easypick.nvim" })
 
 	-- autocompletion
 	use("hrsh7th/nvim-cmp") -- completion plugin
@@ -70,7 +96,10 @@ return packer.startup(function(use)
 	use("rafamadriz/friendly-snippets") -- useful snippets
 
 	-- managing & installing lsp servers, linters & formatters
-	use("williamboman/mason.nvim") -- in charge of managing lsp servers, linters & formatters
+	use({
+		"williamboman/mason.nvim",
+		run = ":MasonUpdate", -- :MasonUpdate updates registry contents
+	}) -- in charge of managing lsp servers, linters & formatters
 	use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
 
 	-- configuring lsp servers
@@ -80,7 +109,6 @@ return packer.startup(function(use)
 		"glepnir/lspsaga.nvim",
 		branch = "main",
 		requires = {
-			{ "nvim-tree/nvim-web-devicons" },
 			{ "nvim-treesitter/nvim-treesitter" },
 		},
 	}) -- enhanced lsp uis
@@ -106,6 +134,9 @@ return packer.startup(function(use)
 
 	-- git integration
 	use("lewis6991/gitsigns.nvim") -- show line modifications on left hand side
+
+	-- make Neovim's fold look modern and keep high performance
+	use({ "kevinhwang91/nvim-ufo", requires = "kevinhwang91/promise-async" })
 
 	if packer_bootstrap then
 		require("packer").sync()
