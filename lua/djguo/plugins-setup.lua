@@ -138,6 +138,9 @@ return packer.startup(function(use)
 	-- make Neovim's fold look modern and keep high performance
 	use({ "kevinhwang91/nvim-ufo", requires = "kevinhwang91/promise-async" })
 
+	-- use "lukas-reineke/indent-blankline.nvim"
+	use("lukas-reineke/indent-blankline.nvim")
+
 	if packer_bootstrap then
 		require("packer").sync()
 	end
