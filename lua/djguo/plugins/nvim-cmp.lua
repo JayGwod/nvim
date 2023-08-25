@@ -35,6 +35,7 @@ cmp.setup({
 		["<S-Space>"] = cmp.mapping.complete(), -- show completion suggestions
 		["<C-e>"] = cmp.mapping.abort(), -- close completion window
 		["<CR>"] = cmp.mapping.confirm({ select = false }),
+		["<Space>"] = cmp.mapping.confirm({ select = false }),
 	}),
 	-- sources for autocompletion
 	sources = cmp.config.sources({

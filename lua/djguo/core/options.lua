@@ -12,7 +12,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 
 -- Maintain undo history between sessions
 opt.undofile = true
-opt.undodir = "./undodir"
+opt.undodir = os.getenv("HOME") .. "/.local/share/nvim/undodir"
 
 -- Spell Checking
 opt.spell = true
